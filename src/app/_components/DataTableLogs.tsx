@@ -11,6 +11,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import { ChevronDownIcon } from 'lucide-react';
 import { useState } from 'react';
 
 import {
@@ -21,8 +22,16 @@ import {
   ViewOptions,
 } from '@/components/resources';
 import { InputSearch } from '@/components/resources/DataTable/InputSearch';
+import {
+  Button,
+  Calendar,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui';
 import { useIsMounted } from '@/hooks';
 import { Log } from '@/interfaces/zk';
+import { formatDate } from '@/lib/date';
 import { useGetAllLogs } from '@/services/zk/hook';
 
 export const DataTableLogs = () => {
@@ -61,8 +70,11 @@ export const DataTableLogs = () => {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [date, setDate] = useState<Date | undefined>(new Date());
 
-  const { data, isLoading } = useGetAllLogs();
+  const { data, isLoading } = useGetAllLogs({
+    date: date ? formatDate(date) : undefined,
+  });
   const listLogs = data?.data;
 
   const table = useReactTable({
@@ -86,12 +98,34 @@ export const DataTableLogs = () => {
 
   return (
     <>
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <InputSearch
           table={table}
           search={{ key: 'name', placeholder: 'Filter names' }}
         />
-        <ViewOptions table={table} />
+        <div className="flex flex-wrap items-center justify-between gap-2 max-md:w-full">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                id="date"
+                className="w-36 justify-between font-normal"
+              >
+                {date ? formatDate(date) : 'Select date'}
+                <ChevronDownIcon />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                disabled={{ after: new Date() }}
+              />
+            </PopoverContent>
+          </Popover>
+          <ViewOptions table={table} />
+        </div>
       </div>
 
       {!isLoading ? (

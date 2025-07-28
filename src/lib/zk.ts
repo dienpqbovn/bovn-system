@@ -1,18 +1,15 @@
 import { ZkLogType } from '@/interfaces/zk';
 
-export const filterLogsToday = (logs: ZkLogType[]): ZkLogType[] => {
-  const now = new Date();
+import { formatDate } from './date';
 
-  const startOfToday = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-  ).getTime();
-  const endOfToday = startOfToday + 24 * 60 * 60 * 1000;
-
+export const filterLogsByDate = (
+  logs: ZkLogType[],
+  targetDate: string,
+): ZkLogType[] => {
   return logs.filter((log) => {
-    const time = new Date(log.recordTime).getTime();
-    return time >= startOfToday && time < endOfToday;
+    const record = new Date(log.recordTime);
+    const localDate = formatDate(record);
+    return localDate === targetDate;
   });
 };
 

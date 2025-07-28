@@ -1,12 +1,21 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import ZKLib from 'node-zklib';
 
 import { Log, LogResponse, ZkLogType } from '@/interfaces/zk';
 import { formatDate, formatTime } from '@/lib/date';
 import { getUsersFromSheet } from '@/lib/google-sheet';
-import { calculateWorkUnits, filterLogsToday } from '@/lib/zk';
+import { calculateWorkUnits } from '@/lib/zk';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const url = new URL(req.url);
+  const dateParam = url.searchParams.get('date'); // YYYY-MM-DD
+
+  const now = new Date();
+  const today = formatDate(now);
+
+  const targetDate =
+    dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam) ? dateParam : today;
+
   const zkInstance = new ZKLib('192.168.1.201', 4370, 10000);
   await zkInstance.createSocket();
 
@@ -15,11 +24,16 @@ export async function GET() {
   await zkInstance.disconnect();
 
   const usersMap = await getUsersFromSheet();
-  const todayLogs = filterLogsToday(logs);
+
+  // lọc theo ngày được truyền
+  const filteredLogs = logs.filter((log) => {
+    const logDate = formatDate(new Date(log.recordTime));
+    return logDate === targetDate;
+  });
 
   const grouped: Record<string, Omit<Log, 'id' | 'workUnits'>> = {};
 
-  for (const log of todayLogs) {
+  for (const log of filteredLogs) {
     const userId = log.deviceUserId;
     const name = usersMap[userId] ?? null;
     const record = new Date(log.recordTime);
@@ -59,5 +73,5 @@ export async function GET() {
     };
   });
 
-  return NextResponse.json({ data: result } as LogResponse);
+  return NextResponse.json({ data: result } satisfies LogResponse);
 }

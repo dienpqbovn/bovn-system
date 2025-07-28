@@ -1,1 +1,3 @@
-export {};
+export type LogsQueryParams = {
+  date?: string;
+};

@@ -19,7 +19,7 @@ export function InputSearch<TData>({
       onChange={(event) =>
         table.getColumn(search.key)?.setFilterValue(event.target.value)
       }
-      className="max-w-sm"
+      className="md:max-w-sm"
     />
   );
 }
