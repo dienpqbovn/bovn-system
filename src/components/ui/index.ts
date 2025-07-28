@@ -6,6 +6,7 @@ export * from './DropdownMenu';
 export * from './Input';
 export * from './Popover';
 export * from './Select';
+export * from './Separator';
 export * from './Skeleton';
 export * from './Sonner';
 export * from './Table';

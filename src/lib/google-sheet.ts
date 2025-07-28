@@ -30,3 +30,30 @@ export const getUsersFromSheet = async (): Promise<Record<string, string>> => {
 
   return map;
 };
+
+export const checkEmailInGoogleSheet = async (
+  email: string,
+): Promise<{ code: string } | null> => {
+  const sheets = google.sheets({ version: 'v4', auth });
+
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: ENVIRONMENTS.SHEET_ID,
+    range: `${SHEET_NAME}!A2:C`,
+  });
+
+  const rows = response.data.values || [];
+
+  for (const row of rows) {
+    const code = row[0];
+    const emailFromSheet = row[2];
+
+    if (
+      emailFromSheet &&
+      emailFromSheet.trim().toLowerCase() === email.toLowerCase()
+    ) {
+      return { code };
+    }
+  }
+
+  return null;
+};

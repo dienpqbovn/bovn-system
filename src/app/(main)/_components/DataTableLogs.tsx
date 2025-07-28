@@ -100,8 +100,6 @@ export const DataTableLogs = () => {
     },
   });
 
-  console.log('aaa');
-
   return (
     <>
       {axios.isAxiosError(error) && error.response && (
