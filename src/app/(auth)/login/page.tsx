@@ -30,14 +30,14 @@ export default function LoginPage() {
   }, [router, searchParams]);
 
   const handleLoginWithGoogle = () => {
-    signIn('google');
+    signIn('google', { callbackUrl: '/' });
   };
 
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="justify-center">
         <Image
-          src="/favicon.ico"
+          src="/logo.png"
           alt="Logo"
           width={32}
           height={32}

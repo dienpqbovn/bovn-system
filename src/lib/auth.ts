@@ -1,5 +1,7 @@
-import { NextAuthOptions } from 'next-auth';
+import { NextAuthOptions, Session } from 'next-auth';
+import { getServerSession } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
+import { NextResponse } from 'next/server';
 
 import { checkEmailInGoogleSheet } from './google-sheet';
 
@@ -22,4 +24,16 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/login',
   },
+};
+
+export const withAuth = async (
+  handler: (session: Session) => Promise<NextResponse>,
+) => {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  }
+
+  return handler(session);
 };

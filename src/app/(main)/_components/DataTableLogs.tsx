@@ -1,20 +1,9 @@
 'use client';
 
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
-  VisibilityState,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
+import { ColumnDef } from '@tanstack/react-table';
 import axios from 'axios';
 import { ChevronDownIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { useMemo, useState } from 'react';
 
 import {
   ColumnHeader,
@@ -34,7 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui';
-import { useIsMounted } from '@/hooks';
+import { useDataTable } from '@/hooks';
 import { Log } from '@/interfaces/zk';
 import { formatDate } from '@/lib/date';
 import { useGetAllLogs } from '@/services/zk/hook';
@@ -70,35 +59,16 @@ export const DataTableLogs = () => {
       },
     },
   ];
-  const isMounted = useIsMounted();
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState({});
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
   const [date, setDate] = useState<Date | undefined>(new Date());
 
   const { data, isLoading, error } = useGetAllLogs({
     date: date ? formatDate(date) : undefined,
   });
 
-  const table = useReactTable({
-    data: data?.data ?? [],
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    onRowSelectionChange: setRowSelection,
-    onColumnVisibilityChange: setColumnVisibility,
-    onSortingChange: setSorting,
-    getSortedRowModel: isMounted() ? getSortedRowModel() : undefined,
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    state: {
-      rowSelection,
-      columnVisibility,
-      sorting,
-      columnFilters,
-    },
-  });
+  const tableData = useMemo(() => data?.data || [], [data]);
+
+  const { table } = useDataTable(tableData, columns);
 
   return (
     <>
