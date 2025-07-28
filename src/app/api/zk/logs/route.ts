@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import ZKLib from 'node-zklib';
 
-import { Log, ZkLogType } from '@/interfaces/zk';
+import { Log, LogResponse, ZkLogType } from '@/interfaces/zk';
 import { formatDate, formatTime } from '@/lib/date';
 import { getUsersFromSheet } from '@/lib/google-sheet';
-import { filterLogsToday } from '@/lib/zk';
+import { calculateWorkUnits, filterLogsToday } from '@/lib/zk';
 
 export async function GET() {
   const zkInstance = new ZKLib('192.168.1.201', 4370, 10000);
@@ -17,7 +17,7 @@ export async function GET() {
   const usersMap = await getUsersFromSheet();
   const todayLogs = filterLogsToday(logs);
 
-  const grouped: Record<string, Omit<Log, 'id'>> = {};
+  const grouped: Record<string, Omit<Log, 'id' | 'workUnits'>> = {};
 
   for (const log of todayLogs) {
     const userId = log.deviceUserId;
@@ -47,10 +47,17 @@ export async function GET() {
     }
   }
 
-  const result: Log[] = Object.entries(grouped).map(([key, value]) => ({
-    id: key.split('-')[0],
-    ...value,
-  }));
+  const result: Log[] = Object.entries(grouped).map(([key, value]) => {
+    const workUnits = value.endTime
+      ? calculateWorkUnits(value.startTime, value.endTime)
+      : 0;
 
-  return NextResponse.json({ data: result });
+    return {
+      id: key.split('-')[0],
+      ...value,
+      workUnits,
+    };
+  });
+
+  return NextResponse.json({ data: result } as LogResponse);
 }

@@ -11,6 +11,7 @@ export type Log = {
   date: string;
   startTime: string;
   endTime: string | null;
+  workUnits: number;
 };
 
 export type LogResponse = {
