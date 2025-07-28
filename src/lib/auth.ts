@@ -32,7 +32,10 @@ export const withAuth = async (
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json(
+      { code: 401, message: 'Unauthorized' },
+      { status: 401 },
+    );
   }
 
   return handler(session);

@@ -10,8 +10,17 @@ export const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       retry: (failureCount, error) => {
         if (failureCount >= 3) return false;
-        if (error instanceof Error && error.message.includes('401'))
-          return false;
+
+        if (axios.isAxiosError(error) && error.response) {
+          const { data } = error.response as AxiosResponse<{
+            message: string;
+            code?: 'NETWORK_ERROR' | '401';
+          }>;
+
+          if (data.code === 'NETWORK_ERROR' || data.code === '401')
+            return false;
+        }
+
         return true;
       },
     },

@@ -79,6 +79,7 @@ export async function GET(req: NextRequest) {
     } catch {
       return NextResponse.json(
         {
+          code: 'NETWORK_ERROR',
           message:
             'Network connection error. Please check your company LAN or VPN connection.',
         },
