@@ -1,7 +1,6 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-import axios from 'axios';
 import { ChevronDownIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
@@ -72,10 +71,13 @@ export const DataTableLogs = () => {
 
   return (
     <>
-      {axios.isAxiosError(error) && error.response && (
+      {error && (
         <Alert variant="destructive">
           <AlertTitle>Oops!</AlertTitle>
-          <AlertDescription>{error.response.data.message}</AlertDescription>
+          <AlertDescription>
+            Network connection error. Please check your company LAN or VPN
+            connection.
+          </AlertDescription>
         </Alert>
       )}
       <div className="flex flex-wrap items-center justify-between gap-2">

@@ -8,6 +8,7 @@ export const LoginGoogle = () => {
   const handleLoginWithGoogle = () => {
     signIn('google', { callbackUrl: '/' });
   };
+
   return (
     <Button
       variant="outline"
