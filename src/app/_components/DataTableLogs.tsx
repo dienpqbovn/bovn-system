@@ -11,8 +11,10 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import axios from 'axios';
 import { ChevronDownIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 import {
   ColumnHeader,
@@ -23,6 +25,9 @@ import {
 } from '@/components/resources';
 import { InputSearch } from '@/components/resources/DataTable/InputSearch';
 import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Calendar,
   Popover,
@@ -72,13 +77,12 @@ export const DataTableLogs = () => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [date, setDate] = useState<Date | undefined>(new Date());
 
-  const { data, isLoading } = useGetAllLogs({
+  const { data, isLoading, error } = useGetAllLogs({
     date: date ? formatDate(date) : undefined,
   });
-  const listLogs = data?.data;
 
   const table = useReactTable({
-    data: listLogs || [],
+    data: data?.data ?? [],
     columns,
     getCoreRowModel: getCoreRowModel(),
     onRowSelectionChange: setRowSelection,
@@ -96,8 +100,16 @@ export const DataTableLogs = () => {
     },
   });
 
+  console.log('aaa');
+
   return (
     <>
+      {axios.isAxiosError(error) && error.response && (
+        <Alert variant="destructive">
+          <AlertTitle>Oops!</AlertTitle>
+          <AlertDescription>{error.response.data.message}</AlertDescription>
+        </Alert>
+      )}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <InputSearch
           table={table}
