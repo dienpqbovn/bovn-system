@@ -12,8 +12,6 @@ import {
 } from '@tanstack/react-table';
 import { useState } from 'react';
 
-import { useIsMounted } from './useIsMounted';
-
 export const useDataTable = <TData>(
   data: TData[],
   columns: ColumnDef<TData, any>[],
