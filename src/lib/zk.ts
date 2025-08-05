@@ -1,18 +1,3 @@
-import { ZkLogType } from '@/interfaces/zk';
-
-import { formatDate } from './date';
-
-export const filterLogsByDate = (
-  logs: ZkLogType[],
-  targetDate: string,
-): ZkLogType[] => {
-  return logs.filter((log) => {
-    const record = new Date(log.recordTime);
-    const localDate = formatDate(record);
-    return localDate === targetDate;
-  });
-};
-
 export const calculateWorkUnits = (start: string, end: string): number => {
   if (!start || !end) return 0;
 
